@@ -66,6 +66,7 @@ let col = 1
 let fp2 = []
 fp1 = Shuffle(images)
 fp1 = fp1.indexOf('farmer.png')
+document.querySelector('#whichP').innerHTML = "Player 1's turn"
 for (let i = 0; i < images.length; i++) {
     if ('farmer.png' == images[i]) {
         fp2[0] = col
@@ -149,16 +150,18 @@ function isLegalMove(selector) {
 function play() {
     if (player1.isPlay() && player2.isPlay() && !player1.isExactly11() && !player2.isExactly11()) {
         if (currentPlayer === player1) {
+            document.querySelector('#whichP').innerHTML = "Player 2's turn"
             currentPlayer = player2
             if (isPVE) setTimeout(function () {getLegalMove()}, 500)
         } else if (currentPlayer === player2) {
+            document.querySelector('#whichP').innerHTML = "Player 1's turn"
             currentPlayer = player1
         }
         rounds++
     } else {
         player1.isExactly11() || player2.isLose() 
-            ? info.innerHTML = "Player 1 wins in: " + rounds
-            : info.innerHTML = "Player 2 wins in: " + rounds
+            ? info.innerHTML = 'Player 1 wins in: ' + rounds
+            : info.innerHTML = 'Player 2 wins in: ' + rounds
         document.querySelectorAll('td').forEach(x => x.firstChild.setAttribute('onclick', null))
     }
     document.querySelector('#p1').innerHTML = 'Player 1: Red: ' + player1.getRed() + ', Green: ' + player1.getGreen()
