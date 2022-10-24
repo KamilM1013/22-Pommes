@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="game" >
+        <div class="buttons">
+            <input type="button" class="btnPVP" value="PVP" onclick="PVP()">
+            <input type="button" class="btnPVC" value="PVC" onclick="PVC()">
+            <input type="button" class="btnCVC" value="CVC" onclick="CVC()">
+            <input type="button" class="refresh" value="Refresh" onclick="location.reload(true)">
+            <input type="button" class="pause" value="Pause" onclick="pause()">
+        </div>
+        <table id="gameBoard">
+        </table>
+    </div>
+    <div class="hud">
+        <p id="p1"></p>
+        <p id="p2"></p>
+        <p id="info"></p>
+    </div>
+    
+    <script type="text/javascript" src="game.js"></script>
+</body>
+</html>
