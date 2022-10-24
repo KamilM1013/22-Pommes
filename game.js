@@ -168,10 +168,6 @@ function paint(selector) {
     let allP = []
     let col = 1
     let dp = document.querySelector(selector).id.split('').slice(6)
-    //let img = Array.from(document.querySelectorAll('.gameImages'))
-    //console.log(img)
-    //img = img.find(x => x.id == 'field-farmer').parentElement.id.split('')
-    //console.log(Math.floor(Math.random() * images.length))
     let tds = document.querySelectorAll('td')
     for (let i = 0; i < images.length; i++) {
         allP[i] = (col + '' + (((i + 1) % 5) == 0 ? 5 : ((i + 1) % 5))).split('')
@@ -186,7 +182,7 @@ function paint(selector) {
         }
         if ((i + 1) % 5 == 0) col++
     }
-    console.log(allP)
+    //console.log(allP)
 }
 
 function PVP() {
@@ -196,32 +192,42 @@ function PVE() {
     location.reload(true)
 }
 function EVE() {
-    //location.reload(true)
-    getLegalMove()
+    myLoop();
+}
+function myLoop() {            
+    setTimeout(function () {   
+        getLegalMove()          
+        if (player1.isPlay() && player2.isPlay() && !player1.isExactly11() && !player2.isExactly11()) {           //  if the counter < 10, call the loop function
+            myLoop()            
+        }                       
+    }, 500)
 }
 
+
+
 function getLegalMove() {
-    let selector
-    let allP = []
-    let col = 1
-    let img = Array.from(document.querySelectorAll('.gameImages'))
-    let random = Math.floor(Math.random() * images.length)
-    let tds = document.querySelectorAll('td')
-    let legal = []
-    img = img.find(x => x.id == 'field-farmer').parentElement.id.split('')
-    for (let i = 0; i < images.length; i++) {
-        allP[i] = (col + '' + (((i + 1) % 5) == 0 ? 5 : ((i + 1) % 5))).split('')
-        if ((img[0] == allP[i][0] && img[1] != allP[i][1]) 
-         || (img[0] != allP[i][0] && img[1] == allP[i][1])) {
-            if (tds[i].firstChild.id != 'empty') {
-                legal[i] = (col + '' + (((i + 1) % 5) == 0 ? 5 : ((i + 1) % 5)))
+    //setTimeout(function() {
+        let selector
+        let allP = []
+        let col = 1
+        let img = Array.from(document.querySelectorAll('.gameImages'))
+        let tds = document.querySelectorAll('td')
+        let legal = []
+        img = img.find(x => x.id == 'field-farmer').parentElement.id.split('')
+        for (let i = 0; i < images.length; i++) {
+            allP[i] = (col + '' + (((i + 1) % 5) == 0 ? 5 : ((i + 1) % 5))).split('')
+            if ((img[0] == allP[i][0] && img[1] != allP[i][1])
+                || (img[0] != allP[i][0] && img[1] == allP[i][1])) {
+                if (tds[i].firstChild.id != 'empty') {
+                    legal[i] = (col + '' + (((i + 1) % 5) == 0 ? 5 : ((i + 1) % 5)))
+                }
             }
+            if ((i + 1) % 5 == 0) col++
         }
-        if ((i + 1) % 5 == 0) col++
-    }
-    console.log(legal.filter(x => x > 0))
-    legal = legal.filter(x => x > 0)
-    selector = legal[Math.floor(Math.random() * legal.length)]
-    console.log(selector)
-    move('#field-' + selector)
+        //console.log(legal.filter(x => x > 0))
+        legal = legal.filter(x => x > 0)
+        selector = legal[Math.floor(Math.random() * legal.length)]
+        //console.log(selector)
+        move('#field-' + selector)
+    //},500 ) 
 }
