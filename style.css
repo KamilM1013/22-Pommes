@@ -6,6 +6,20 @@ body {
     float: left;
 }
 
+.game input {
+    font-size: 20px;
+}
+
+.hud {
+    font-size: 20px;
+    padding-top: 50px;
+}
+
+#p1, #p2 {
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 table, tr, td {
     border: 2px solid #000000;
     border-collapse: collapse;
@@ -22,6 +36,8 @@ table img {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     float: left;
 }
+
+
 
 
 

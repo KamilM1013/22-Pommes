@@ -16,7 +16,7 @@ class Player {
         return (this.red > 11 || this.green > 11) ? true : false
     }
     isPlay() {
-        return (this.red < 11 && this.green < 11) ? true : false
+        return (this.red <= 11 && this.green <= 11) ? true : false
     }
     setGreen(points) {
         this.green += points
@@ -145,24 +145,26 @@ function isLegalMove(selector) {
     return legalMove
 }
 
+
+// isExactly11() (this.red == 11 && this.green == 11) ? true : false
+// isLose()      (this.red > 11 || this.green > 11)   ? true : false
+// isPlay()      (this.red <= 11 && this.green <= 11) ? true : false
 function play() {
-    if (player1.isPlay() && player2.isPlay()) {
+    if (player1.isPlay() && player2.isPlay() && !player1.isExactly11() && !player2.isExactly11()) {
         if (currentPlayer === player1) {
             currentPlayer = player2
         } else if (currentPlayer === player2) {
             currentPlayer = player1
         }
         rounds++
-        
     } else {
         player1.isExactly11() || player2.isLose() 
-        ? info.innerHTML = "Gracz 1 wygrał w: " + rounds
-        : info.innerHTML = "Gracz 2 wygrał w: " + rounds
+            ? info.innerHTML = "Player 1 win in: " + rounds
+            : info.innerHTML = "Player 2 win in: " + rounds
         document.querySelectorAll('td').forEach(x => x.firstChild.setAttribute('onclick', null))
     }
-    document.querySelector('#p1').innerHTML = 'Gracz 1: Czerwone: ' + player1.getRed() + ', Zielone: ' + player1.getGreen()
-    document.querySelector('#p2').innerHTML = 'Gracz 2: Czerwone: ' + player2.getRed() + ', Zielone: ' + player2.getGreen()
-    
+    document.querySelector('#p1').innerHTML = 'Player 1: Red: ' + player1.getRed() + ', Green: ' + player1.getGreen()
+    document.querySelector('#p2').innerHTML = 'Player 2: Red: ' + player2.getRed() + ', Green: ' + player2.getGreen()
 }
 
 function paint(selector) {
