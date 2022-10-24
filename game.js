@@ -150,6 +150,7 @@ function play() {
     if (player1.isPlay() && player2.isPlay() && !player1.isExactly11() && !player2.isExactly11()) {
         if (currentPlayer === player1) {
             currentPlayer = player2
+            if (isPVE) setTimeout(function () {getLegalMove()}, 500)
         } else if (currentPlayer === player2) {
             currentPlayer = player1
         }
@@ -188,25 +189,28 @@ function paint(selector) {
 function PVP() {
     location.reload(true)
 }
+let isPVE = false
 function PVE() {
-    location.reload(true)
+    isPVE = true
 }
+
+
 function EVE() {
-    myLoop();
+    EVELoop();
 }
-function myLoop() {            
+function EVELoop() {            
     setTimeout(function () {   
         getLegalMove()          
         if (player1.isPlay() && player2.isPlay() && !player1.isExactly11() && !player2.isExactly11()) {           //  if the counter < 10, call the loop function
-            myLoop()            
+            EVELoop()            
         }                       
     }, 500)
 }
 
 
 
+
 function getLegalMove() {
-    //setTimeout(function() {
         let selector
         let allP = []
         let col = 1
@@ -224,10 +228,7 @@ function getLegalMove() {
             }
             if ((i + 1) % 5 == 0) col++
         }
-        //console.log(legal.filter(x => x > 0))
         legal = legal.filter(x => x > 0)
         selector = legal[Math.floor(Math.random() * legal.length)]
-        //console.log(selector)
-        move('#field-' + selector)
-    //},500 ) 
+        move('#field-' + selector) 
 }
