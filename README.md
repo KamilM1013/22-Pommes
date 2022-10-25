@@ -1,5 +1,6 @@
 # 22-Pommes
 INSTRUCTIONS
+
 Both players must collect exactly 11 green and 11 red apples to win. 
 To do this, they move the farmer to the field in the same row or column, who will then be able to collect apples from the field. 
 The fields with apples and the farmer are arranged in a square of 5x5. 
