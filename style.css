@@ -20,6 +20,14 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+#p1 {
+   color: rgb(26, 83, 140);
+}
+
+#p2 {
+    color:crimson;
+}
+
 table, tr, td {
     border: 2px solid #000000;
     border-collapse: collapse;

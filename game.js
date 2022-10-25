@@ -177,7 +177,9 @@ function paint(selector) {
         allP[i] = (col + '' + (((i + 1) % 5) == 0 ? 5 : ((i + 1) % 5))).split('')
         if ((dp[0] == allP[i][0] && dp[1] != allP[i][1]) || (dp[0] != allP[i][0] && dp[1] == allP[i][1])) {
             if (tds[i].firstChild.id != 'empty') {
-                tds[i].style.backgroundColor = '#1f7c98'
+                console.log(currentPlayer === player1)
+                !(currentPlayer === player1) ? tds[i].style.backgroundColor = '#1f7c98' : tds[i].style.backgroundColor = '#C44E4E'
+                //tds[i].style.backgroundColor = '#1f7c98'
             }
         } else {
             if (tds[i].firstChild.id != 'empty') {
