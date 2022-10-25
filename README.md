@@ -1,7 +1,12 @@
 # 22-Pommes
-Obaj gracze muszą zebrać dokładnie 11 zielonych i 11 czerwonych jabłek, aby wygrać.
-W tym celu przenoszą farmera na pole w tym samym wierszu lub kolumnie, 
-który następnie będzie mógł zebrać jabłka z danego pola. 
-Pola z jabłkami i farmer są ułożeni w kwadrat 5x5. 
-Gra kończy się, gdy graczowi udało się zebrać odpowiednią liczbę jabłek 
-lub gdy zmusi przeciwnika do zebrania więcej niż 11 jabłek.
+INSTRUCTIONS
+Both players must collect exactly 11 green and 11 red apples to win. 
+To do this, they move the farmer to the field in the same row or column, who will then be able to collect apples from the field. 
+The fields with apples and the farmer are arranged in a square of 5x5. 
+The game ends when the player has managed to collect the right number of apples or when he forces the opponent to collect more than 11 apples.
+
+GAME-TREE COMPLEXCITY
+
+5^10
+
+(5 is the branching factor while 10 is depth)
