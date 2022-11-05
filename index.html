@@ -11,6 +11,12 @@
     <div class="game" >
         <div class="buttons">
             <input type="button" class="btnPVP" value="Player vs player" onclick="PVP()">
+            <div class="dropdown">
+                <div class="dropdown-content">
+                    <a href="#" onclick="isRandom()">Random</a>
+                    <a href="#" onclick="isMinMax()">Min Max</a>
+                </div>
+            </div>
             <input type="button" class="btnPVC" value="Player vs random player" onclick="PVE()">
             <input type="button" class="btnCVC" value="Random player vs random player" onclick="EVE()">
             <input type="button" class="refresh" value="Refresh" onclick="location.reload(true)">
