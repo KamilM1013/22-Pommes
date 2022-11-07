@@ -7,16 +7,40 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
+<script>
+    function show_list() {
+        var courses = document.getElementById("courses_id");
+
+        if (courses.style.display == "block") {
+            courses.style.display = "none";
+        } else {
+            courses.style.display = "block";
+        }
+    }
+    window.onclick = function (event) {
+        if (!event.target.matches('.dropdown_button')) {
+            document.getElementById('courses_id')
+                .style.display = "none";
+        }
+    }   
+</script>
+
 <body>
     <div class="game" >
         <div class="buttons">
             <input type="button" class="btnPVP" value="Player vs player" onclick="PVP()">
-            <div class="dropdown">
-                <div class="dropdown-content">
-                    <a href="#" onclick="isRandom()">Random</a>
-                    <a href="#" onclick="isMinMax()">Min Max</a>
-                </div>
-            </div>
+            <body>
+                    <div class="dropdown_list">
+                        <button class="dropdown_button"
+                            onclick="show_list()">
+                            Select algorithm
+                        </button>
+             
+                        <div id="courses_id" class="courses">
+                            <li><a href="#" onclick="isRandom()">Random</a></li>
+                            <li><a href="#" onclick="isMinMax()">Min Max</a></li>
+                        </div>
+                    </div>
             <input type="button" class="btnPVC" value="Player vs random player" onclick="PVE()">
             <input type="button" class="btnCVC" value="Random player vs random player" onclick="EVE()">
             <input type="button" class="refresh" value="Refresh" onclick="location.reload(true)">
