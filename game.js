@@ -148,26 +148,30 @@ function Shuffle(array) {
 }
 
 function move(selector) {
+    setTimeout(function(){
+        if (selector == '#field-farmer' || !isLegalMove(selector)) return
+        //console.log(selector)
+        paint(selector)
+        if (isLegalMove(selector)) {
+            document.querySelector('#field-farmer').parentElement.style.backgroundColor = '#7b7b7b'
+        }
+        let img = document.querySelector(selector)
+        let oldFarmer = document.querySelector('#field-farmer')
+        img.parentElement.style.backgroundColor = '#dbdbdb'
+        //console.log(img.alt)
+        //console.log(selector)
+        currentPlayer.typeOfPoints(img.alt)
+        oldFarmer.style.visibility = 'hidden'
+        oldFarmer.setAttribute('id', 'empty')
+        img.src = 'japka//farmer.png'
+        img.setAttribute('id', 'field-farmer')
+        img.setAttribute('onclick', "move('#" + img.id + "')")
+        getCurrentBoard()
+        play()
+    }, 1000);
+        
+    
 
-    if (selector == '#field-farmer' || !isLegalMove(selector)) return
-    //console.log(selector)
-    paint(selector)
-    if (isLegalMove(selector)) {
-        document.querySelector('#field-farmer').parentElement.style.backgroundColor = '#7b7b7b'
-    }
-    let img = document.querySelector(selector)
-    let oldFarmer = document.querySelector('#field-farmer')
-    img.parentElement.style.backgroundColor = '#dbdbdb'
-    //console.log(img.alt)
-    //console.log(selector)
-    currentPlayer.typeOfPoints(img.alt)
-    oldFarmer.style.visibility = 'hidden'
-    oldFarmer.setAttribute('id', 'empty')
-    img.src = 'japka//farmer.png'
-    img.setAttribute('id', 'field-farmer')
-    img.setAttribute('onclick', "move('#" + img.id + "')")
-    getCurrentBoard()
-    play()
 }
 
 function isLegalMove(selector) {
@@ -204,7 +208,6 @@ function play() {
 }
 
 function paint(selector) {
-    console.log(selector)
     let allP = []
     let col = 1
     let dp = document.querySelector(selector).id.split('').slice(6)
@@ -371,23 +374,29 @@ function evaluate(node, isMaximizing) {
             } else if(node.color == 'r') {
                 rApples += parseInt(node.value)
             }
-            if (gApples > 11 && rApples > 11) {
-                return Infinity
+            if (gApples > 11 ||  rApples > 11) {
+                score -= 1;
+                console.log('haj')
+                return score
             }
-            if (gApples == 11 && rApples == 11) {
-                return -Infinity
+            if (gApples == 11 &&  rApples == 11) {
+                score += 1
+                return score;
             }
+            // if(gApples % 2 == 1 || rApples % 2 == 1) {
+            //     score += 1;
+            // }
             if(node.value == 1) {
-                score += 10
+                score -= 10000;
             }
             if(node.value == 2) {
-                score += 100
+                score -= 1000;
             }
             if(node.value == 3) {
-                score += 1000
+                score -= 100;
             }
             if(node.value == 5) {
-                score += 10000
+                score -= 10;
             }
         }
         if(!isMaximizing) {
@@ -398,23 +407,28 @@ function evaluate(node, isMaximizing) {
             } else if(node.color == 'r') {
                 rApples += parseInt(node.value)
             }
-            if (gApples > 11 && rApples > 11) {
-                return -Infinity
+            if (gApples > 11 ||  rApples > 11) {
+                score += 1;
+                return score
             }
-            if (gApples == 11 && rApples == 11) {
-                return Infinity
+            if (gApples == 11 &&  rApples == 11) {
+                score -= 1;
+                return score
             }
+            // if(gApples % 2 == 1 || rApples % 2 == 1) {
+            //     score -= 1;
+            // }
             if(node.value == 1) {
-                score -= 10
+                score += 10000;
             }
             if(node.value == 2) {
-                score -= 100
+                score += 1000;
             }
             if(node.value == 3) {
-                score -= 1000
+                score += 100;
             }
             if(node.value == 5) {
-                score -= 10000
+                score += 10;
             }
         }
         console.log(node.value)
