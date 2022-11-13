@@ -200,9 +200,11 @@ function play() {
     }
     document.querySelector('#p1').innerHTML = 'Player 1: Red: ' + player1.getRed() + ', Green: ' + player1.getGreen()
     document.querySelector('#p2').innerHTML = 'Player 2: Red: ' + player2.getRed() + ', Green: ' + player2.getGreen()
+    
 }
 
 function paint(selector) {
+    console.log(selector)
     let allP = []
     let col = 1
     let dp = document.querySelector(selector).id.split('').slice(6)
@@ -286,50 +288,45 @@ function isMinMax() {
     israndom = false
 }
 
-
-function minMax(board, depth, isMaximizing) {
+let bestMove = null;
+function minMax(board, node, depth, isMaximizing) {
     let boardCopy = JSON.parse(JSON.stringify(board))
     let legalMoves = getBoardLegalMoves()
-    if (evaluate() == Infinity || depth == 0) {
-        return evaluate()
+    if (evaluate(node, isMaximizing) > 20000 || depth == 0) {
+        return evaluate(node, isMaximizing)
     }
 
     if (isMaximizing) {
         let bestScore = -Infinity;
-        let bestMove
-        let tmpMove
-        console.log(legalMoves)
         legalMoves.forEach(move => {
             let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
             let farmer = getFarmer(boardCopyCopy)
+            let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
             boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
-            console.log(move)
             boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
-            tmpMove = move
-            let score = minMax(boardCopyCopy, depth - 1, false);
+            let score = minMax(boardCopyCopy, fieldValue, depth - 1, false);
             if (score > bestScore) {
                 bestScore = score
-                bestMove = tmpMove
+                bestMove = move
             }
         })
-        return bestMove;
+        return bestScore;
     } else {
         let bestScore = Infinity;
-        let bestMove
-        let tmpMove
         legalMoves.forEach(move => {
             let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
             let farmer = getFarmer(boardCopyCopy)
+            let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
             boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
             boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
-            tmpMove = move
-            let score = minMax(boardCopyCopy, depth - 1, true);
-            if (score > bestScore) {
+            let score = minMax(boardCopyCopy, fieldValue, depth - 1, true);
+            if (score < bestScore) {
                 bestScore = score
-                bestMove = tmpMove
+                bestMove = move
+                //console.log(score)
             }
         })
-        return bestMove;
+        return bestScore;
     }
 }
 
@@ -362,32 +359,88 @@ function getBoardLegalMoves() {
     return legalMoves
 }
 
-function evaluate() {
+function evaluate(node, isMaximizing) {
     let score = 0
-    if (currentPlayer.getGreen() == 0 && currentPlayer.getRed() == 0) {
-        score += 1
-    }
-    if (player1.getGreen() > 11 && player1.getRed() > 11) {
-        return -Infinity
-    }
-    if (player1.getGreen() == 11 && player1.getRed() == 11) {
-        return Infinity
-    }
-    if (player2.getGreen() > 11 && player2.getRed() > 11) {
-        return Infinity
-    }
-    if (player2.getGreen() == 11 && player2.getRed() == 11) {
-        return -Infinity
+
+    if (node !== null) {
+        if(isMaximizing) {
+            let gApples = parseInt(player1.getGreen())
+            let rApples = parseInt(player1.getRed())
+            if(node.color == 'g') {
+                gApples += parseInt(node.value)                
+            } else if(node.color == 'r') {
+                rApples += parseInt(node.value)
+            }
+            if (gApples > 11 && rApples > 11) {
+                return Infinity
+            }
+            if (gApples == 11 && rApples == 11) {
+                return -Infinity
+            }
+            if(node.value == 1) {
+                score += 10
+            }
+            if(node.value == 2) {
+                score += 100
+            }
+            if(node.value == 3) {
+                score += 1000
+            }
+            if(node.value == 5) {
+                score += 10000
+            }
+        }
+        if(!isMaximizing) {
+            let gApples = parseInt(player2.getGreen())
+            let rApples = parseInt(player2.getRed())
+            if(node.color == 'g') {
+                gApples += parseInt(node.value)                
+            } else if(node.color == 'r') {
+                rApples += parseInt(node.value)
+            }
+            if (gApples > 11 && rApples > 11) {
+                return -Infinity
+            }
+            if (gApples == 11 && rApples == 11) {
+                return Infinity
+            }
+            if(node.value == 1) {
+                score -= 10
+            }
+            if(node.value == 2) {
+                score -= 100
+            }
+            if(node.value == 3) {
+                score -= 1000
+            }
+            if(node.value == 5) {
+                score -= 10000
+            }
+        }
+        console.log(node.value)
+    } else {
+        if(isMaximizing){
+            return Infinity
+        } else {
+            return -Infinity
+        }
     }
 
     // board.value
     // board.color
     // currentPlayer.getGreen()
     // currentPlayer.getRed()
+    
     return score
 }
 
 function makeBestMove() {
-    let bestMove = minMax(board, 6, false)
-    console.log(bestMove)
+    let score 
+    new Promise((resolve, reject) => {
+        resolve(score = minMax(board, null, 3, false))
+    }).then(() => {
+        console.log(bestMove)
+        move(`#field-${bestMove.y}${bestMove.x}`)
+    })
+    .catch((e) => {console.log(e)})
 }
