@@ -1,3 +1,4 @@
+//Player Class
 class Player {
     constructor(green = 0, red = 0) {
         this.green = green
@@ -31,6 +32,7 @@ class Player {
     }
 }
 
+//Images used on front-end
 let images = [
     '1g.png',
     '1g.png',
@@ -58,11 +60,14 @@ let images = [
     '1r.png',
     'farmer.png',
 ]
+
+//Game prep
 let player1 = new Player()
 let player2 = new Player()
 let rounds = 1
 let currentPlayer = player1
 
+//Board prep
 let table = document.querySelector('#gameBoard')
 let info = document.querySelector('#info')
 let tbody = table.appendChild(document.createElement('tbody'))
@@ -71,9 +76,12 @@ let col = 1
 let fp2 = []
 let row = []
 let board = []
+
 //fp1 = Shuffle(images)
 //fp1 = fp1.indexOf('farmer.png')
 Shuffle(images)
+
+//Creating game board
 document.querySelector('#whichP').innerHTML = "Player 1's turn"
 for (let i = 0; i < images.length; i++) {
     if ('farmer.png' == images[i]) {
@@ -119,6 +127,7 @@ for (let i = 0; i < images.length; i++) {
     }
 }
 
+//Gets current game state
 function getCurrentBoard() {
     document.querySelectorAll('tr').forEach((row, index) => {
         let i = 0
@@ -137,6 +146,7 @@ function getCurrentBoard() {
     })
 }
 
+//Used to shuffle images on front-end
 function Shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1))
@@ -147,6 +157,7 @@ function Shuffle(array) {
     return array
 }
 
+//Executes a move 
 function move(selector) {
     setTimeout(function(){
         if (selector == '#field-farmer' || !isLegalMove(selector)) return
@@ -174,6 +185,7 @@ function move(selector) {
 
 }
 
+//Checks if move is legal
 function isLegalMove(selector) {
     let fp = ('' + (document.querySelector('#field-farmer').parentElement.id)).split('')
     let dp = document.querySelector(selector).id.split('').slice(6)
@@ -185,6 +197,7 @@ function isLegalMove(selector) {
     return (fp[0] == dp[0] && fp[1] != dp[1]) || (fp[0] != dp[0] && fp[1] == dp[1])
 }
 
+//Switches players each round; checks for win or lose condition
 function play() {
     if (player1.isPlay() && player2.isPlay() && !player1.isExactly11() && !player2.isExactly11()) {
         if (currentPlayer === player1) {
@@ -207,6 +220,7 @@ function play() {
     
 }
 
+//Based on position paint all valid moves
 function paint(selector) {
     let allP = []
     let col = 1
@@ -228,6 +242,7 @@ function paint(selector) {
     //console.log(allP)
 }
 
+//Different game modes
 function PVP() {
     location.reload(true)
 }
@@ -235,6 +250,7 @@ function PVP() {
 let isPVE = false
 let israndom = true
 let isminmax = false
+
 function PVE() {
     isPVE = true
 
@@ -253,6 +269,7 @@ function EVELoop() {
     }, 500)
 }
 
+//Checks for all valid moves for random bot
 function getLegalMove() {
     let selector
     let allP = []
@@ -282,6 +299,7 @@ function getLegalMove() {
     move('#field-' + selector)
 }
 
+//Checks for chosen algorithm
 function isRandom() {
     israndom = true
     isminmax = false
@@ -291,48 +309,7 @@ function isMinMax() {
     israndom = false
 }
 
-let bestMove = null;
-function minMax(board, node, depth, isMaximizing) {
-    let boardCopy = JSON.parse(JSON.stringify(board))
-    let legalMoves = getBoardLegalMoves()
-    if (evaluate(node, isMaximizing) > 20000 || depth == 0) {
-        return evaluate(node, isMaximizing)
-    }
-
-    if (isMaximizing) {
-        let bestScore = -Infinity;
-        legalMoves.forEach(move => {
-            let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
-            let farmer = getFarmer(boardCopyCopy)
-            let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
-            boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
-            boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
-            let score = minMax(boardCopyCopy, fieldValue, depth - 1, false);
-            if (score > bestScore) {
-                bestScore = score
-                bestMove = move
-            }
-        })
-        return bestScore;
-    } else {
-        let bestScore = Infinity;
-        legalMoves.forEach(move => {
-            let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
-            let farmer = getFarmer(boardCopyCopy)
-            let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
-            boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
-            boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
-            let score = minMax(boardCopyCopy, fieldValue, depth - 1, true);
-            if (score < bestScore) {
-                bestScore = score
-                bestMove = move
-                //console.log(score)
-            }
-        })
-        return bestScore;
-    }
-}
-
+//Fetches farmer position
 function getFarmer(board) {
     let farmer
     board.forEach(y => {
@@ -345,6 +322,7 @@ function getFarmer(board) {
     return farmer
 }
 
+//Fetches all valid moves for back-end algorithm calculation
 function getBoardLegalMoves() {
     let farmer = getFarmer(board)
     let legalMoves = []
@@ -362,6 +340,7 @@ function getBoardLegalMoves() {
     return legalMoves
 }
 
+//Determines best move based on score
 function evaluate(node, isMaximizing) {
     let score = 0
 
@@ -448,6 +427,50 @@ function evaluate(node, isMaximizing) {
     return score
 }
 
+//Implementation of minimax algorithm
+let bestMove = null;
+function minMax(board, node, depth, isMaximizing) {
+    let boardCopy = JSON.parse(JSON.stringify(board))
+    let legalMoves = getBoardLegalMoves()
+    if (evaluate(node, isMaximizing) > 20000 || depth == 0) {
+        return evaluate(node, isMaximizing)
+    }
+
+    if (isMaximizing) {
+        let bestScore = -Infinity;
+        legalMoves.forEach(move => {
+            let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
+            let farmer = getFarmer(boardCopyCopy)
+            let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
+            boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
+            boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
+            let score = minMax(boardCopyCopy, fieldValue, depth - 1, false);
+            if (score > bestScore) {
+                bestScore = score
+                bestMove = move
+            }
+        })
+        return bestScore;
+    } else {
+        let bestScore = Infinity;
+        legalMoves.forEach(move => {
+            let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
+            let farmer = getFarmer(boardCopyCopy)
+            let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
+            boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
+            boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
+            let score = minMax(boardCopyCopy, fieldValue, depth - 1, true);
+            if (score < bestScore) {
+                bestScore = score
+                bestMove = move
+                //console.log(score)
+            }
+        })
+        return bestScore;
+    }
+}
+
+//Used to execute the best move
 function makeBestMove() {
     let score 
     new Promise((resolve, reject) => {
