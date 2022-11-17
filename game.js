@@ -203,7 +203,12 @@ function play() {
         if (currentPlayer === player1) {
             document.querySelector('#whichP').innerHTML = "Player 2's turn"
             currentPlayer = player2
-            if (isPVE) makeBestMove()//setTimeout(function () { getLegalMove() }, 500)
+            if (isPVE && isminmax) {
+                makeBestMoveMinMax()
+            } else if (isPVE && isnegamax) {
+                console.log('!!!!!!!!!!!!!!!!!!!!!')
+                makeBestMoveNegaMax()
+            }
         } else if (currentPlayer === player2) {
             document.querySelector('#whichP').innerHTML = "Player 1's turn"
             currentPlayer = player1
@@ -250,6 +255,7 @@ function PVP() {
 let isPVE = false
 let israndom = true
 let isminmax = false
+let isnegamax = false
 
 function PVE() {
     isPVE = true
@@ -293,7 +299,9 @@ function getLegalMove() {
     if (israndom) {
         selector = legal[Math.floor(Math.random() * legal.length)]
     } else if (isminmax) {
-        makeBestMove()
+        makeBestMoveMinMax()
+    } else if (isnegamax) {
+        makeBestMoveNegaMax()
     }
     //selector = legal[Math.floor(Math.random() * legal.length)]
     move('#field-' + selector)
@@ -303,10 +311,17 @@ function getLegalMove() {
 function isRandom() {
     israndom = true
     isminmax = false
+    isnegamax = false
 }
 function isMinMax() {
     isminmax = true
     israndom = false
+    isnegamax = false
+}
+function isNegaMax() {
+    isminmax = false
+    israndom = false
+    isnegamax = true
 }
 
 //Fetches farmer position
@@ -341,7 +356,7 @@ function getBoardLegalMoves() {
 }
 
 //Determines best move based on score
-function evaluate(node, isMaximizing) {
+function evaluateMinMax(node, isMaximizing) {
     let score = 0
 
     if (node !== null) {
@@ -355,7 +370,6 @@ function evaluate(node, isMaximizing) {
             }
             if (gApples > 11 ||  rApples > 11) {
                 score -= 1;
-                console.log('haj')
                 return score
             }
             if (gApples == 11 &&  rApples == 11) {
@@ -427,13 +441,52 @@ function evaluate(node, isMaximizing) {
     return score
 }
 
+function evaluateNegaMax(node) {
+    let score = 0
+
+    if (node !== null) {
+            let gApples = parseInt(player1.getGreen())
+            let rApples = parseInt(player1.getRed())
+            if(node.color == 'g') {
+                gApples += parseInt(node.value)                
+            } else if(node.color == 'r') {
+                rApples += parseInt(node.value)
+            }
+            if (gApples > 11 ||  rApples > 11) {
+                score -= 1;
+                return score
+            }
+            if (gApples == 11 &&  rApples == 11) {
+                score += 1
+                return score;
+            }
+            // if(gApples % 2 == 1 || rApples % 2 == 1) {
+            //     score += 1;
+            // }
+            if(node.value == 1) {
+                score -= 10000;
+            }
+            if(node.value == 2) {
+                score -= 1000;
+            }
+            if(node.value == 3) {
+                score -= 100;
+            }
+            if(node.value == 5) {
+                score -= 10;
+            }
+        console.log(node.value)
+    } 
+    return score
+}
+
 //Implementation of minimax algorithm
 let bestMove = null;
 function minMax(board, node, depth, isMaximizing) {
     let boardCopy = JSON.parse(JSON.stringify(board))
     let legalMoves = getBoardLegalMoves()
-    if (evaluate(node, isMaximizing) > 20000 || depth == 0) {
-        return evaluate(node, isMaximizing)
+    if (evaluateMinMax(node, isMaximizing) > 20000 || depth == 0) {
+        return evaluateMinMax(node, isMaximizing)
     }
 
     if (isMaximizing) {
@@ -470,8 +523,35 @@ function minMax(board, node, depth, isMaximizing) {
     }
 }
 
-//Used to execute the best move
-function makeBestMove() {
+//Implementation of negamax algorithm
+function negaMax(board, node, depth) {
+    let boardCopy = JSON.parse(JSON.stringify(board))
+    let legalMoves = getBoardLegalMoves()
+    if (evaluateNegaMax(node) > 20000 || depth == 0) {
+        return evaluateNegaMax(node)        
+    } else {
+        let bestScore = -Infinity;
+        legalMoves.forEach(move => {
+            let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
+            let farmer = getFarmer(boardCopyCopy)
+            let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
+            boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
+            boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
+            let score = -negaMax(boardCopyCopy, fieldValue, depth - 1, false);
+            if (score > bestScore) {
+                bestScore = score
+                bestMove = move
+            }
+
+        })
+        return bestScore;
+    }
+
+} 
+
+
+//Used to execute the best move for minmax
+function makeBestMoveMinMax() {
     let score 
     new Promise((resolve, reject) => {
         resolve(score = minMax(board, null, 3, false))
@@ -481,3 +561,16 @@ function makeBestMove() {
     })
     .catch((e) => {console.log(e)})
 }
+
+//Used to execute the best move for negamax
+function makeBestMoveNegaMax() {
+    let score 
+    new Promise((resolve, reject) => {
+        resolve(score = negaMax(board, null, 3, false))
+    }).then(() => {
+        console.log(bestMove)
+        move(`#field-${bestMove.y}${bestMove.x}`)
+    })
+    .catch((e) => {console.log(e)})
+}
+
