@@ -462,28 +462,31 @@ function evaluateNegaMax(node) {
                 rApples += parseInt(node.value)
             }
             if (gApples > 11 ||  rApples > 11) {
-                score -= 1;
+                score -= 100000;
                 return score
             }
             if (gApples == 11 &&  rApples == 11) {
-                score += 1
+                score += 100000
                 return score;
             }
             // if(gApples % 2 == 1 || rApples % 2 == 1) {
-            //     score += 1;
+            //     score += 1000;
             // }
-            if(node.value == 1) {
-                score -= 10000;
-            }
-            if(node.value == 2) {
-                score -= 1000;
-            }
-            if(node.value == 3) {
-                score -= 100;
-            }
-            if(node.value == 5) {
-                score -= 10;
-            }
+            // if(gApples % 2 == 0 || rApples % 2 == 0) {
+            //     score -= 1000;
+            // }
+            // if(node.value == 1) {
+            //     score -= 10000;
+            // }
+            // if(node.value == 2) {
+            //     score -= 1000;
+            // }
+            // if(node.value == 3) {
+            //     score -= 100;
+            // }
+            // if(node.value == 5) {
+            //     score -= 10;
+            // }
         console.log(node.value)
     } 
     return score
@@ -627,5 +630,5 @@ function makeBestMoveAlphaBeta() {
         move(`#field-${bestMove.y}${bestMove.x}`)
     })
     .catch((e) => {console.log(e)})
-    }, 1000);
+    }, 5000);
 }
