@@ -159,7 +159,6 @@ function Shuffle(array) {
 
 //Executes a move 
 function move(selector) {
-    setTimeout(function(){
         if (selector == '#field-farmer' || !isLegalMove(selector)) return
         //console.log(selector)
         paint(selector)
@@ -178,11 +177,7 @@ function move(selector) {
         img.setAttribute('id', 'field-farmer')
         img.setAttribute('onclick', "move('#" + img.id + "')")
         getCurrentBoard()
-        play()
-    }, 1000);
-        
-    
-
+        play()   
 }
 
 //Checks if move is legal
@@ -205,9 +200,13 @@ function play() {
             currentPlayer = player2
             if (isPVE && isminmax) {
                 makeBestMoveMinMax()
+                console.log('MINI')
             } else if (isPVE && isnegamax) {
-                console.log('!!!!!!!!!!!!!!!!!!!!!')
                 makeBestMoveNegaMax()
+                console.log('NEGA')
+            } else if (isPVE && isaplhabeta) {
+                makeBestMoveAlphaBeta()
+                console.log('ALPHA')
             }
         } else if (currentPlayer === player2) {
             document.querySelector('#whichP').innerHTML = "Player 1's turn"
@@ -256,6 +255,7 @@ let isPVE = false
 let israndom = true
 let isminmax = false
 let isnegamax = false
+let alphabeta = false
 
 function PVE() {
     isPVE = true
@@ -312,16 +312,25 @@ function isRandom() {
     israndom = true
     isminmax = false
     isnegamax = false
+    isaplhabeta = false
 }
 function isMinMax() {
     isminmax = true
     israndom = false
     isnegamax = false
+    isaplhabeta = false
 }
 function isNegaMax() {
     isminmax = false
     israndom = false
     isnegamax = true
+    isaplhabeta = false
+}
+function isAlphaBeta() {
+    isminmax = false
+    israndom = false
+    isnegamax = false
+    isaplhabeta = true
 }
 
 //Fetches farmer position
@@ -549,9 +558,39 @@ function negaMax(board, node, depth) {
 
 } 
 
+//Implementation of negamax algorithm with aplha-beta pruning
+function alphaBeta(board, node, depth, alpha, beta) {
+    let boardCopy = JSON.parse(JSON.stringify(board))
+    let legalMoves = getBoardLegalMoves()
+    if (evaluateNegaMax(node) > 20000 || depth == 0) {
+        return evaluateNegaMax(node)        
+    } else {
+        let bestScore = -Infinity;
+        legalMoves.forEach(move => {
+            let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
+            let farmer = getFarmer(boardCopyCopy)
+            let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
+            boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
+            boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
+            let score = -negaMax(boardCopyCopy, fieldValue, depth - 1, false);
+            if (score > bestScore) {
+                bestScore = score
+                bestMove = move
+            }
+            alpha = Math.max(alpha, bestScore)
+            if (beta <= alpha) {
+                return
+            }
+
+        })
+        return bestScore;
+    }
+
+} 
 
 //Used to execute the best move for minmax
 function makeBestMoveMinMax() {
+    setTimeout(function(){
     let score 
     new Promise((resolve, reject) => {
         resolve(score = minMax(board, null, 3, false))
@@ -560,10 +599,12 @@ function makeBestMoveMinMax() {
         move(`#field-${bestMove.y}${bestMove.x}`)
     })
     .catch((e) => {console.log(e)})
+    }, 1000);
 }
 
 //Used to execute the best move for negamax
 function makeBestMoveNegaMax() {
+    setTimeout(function(){
     let score 
     new Promise((resolve, reject) => {
         resolve(score = negaMax(board, null, 3, false))
@@ -572,5 +613,19 @@ function makeBestMoveNegaMax() {
         move(`#field-${bestMove.y}${bestMove.x}`)
     })
     .catch((e) => {console.log(e)})
+    }, 1000);
 }
 
+//Used to execute the best move for alpha-beta
+function makeBestMoveAlphaBeta() {
+    setTimeout(function(){
+    let score 
+    new Promise((resolve, reject) => {
+        resolve(score = alphaBeta(board, null, 3, false))
+    }).then(() => {
+        console.log(bestMove)
+        move(`#field-${bestMove.y}${bestMove.x}`)
+    })
+    .catch((e) => {console.log(e)})
+    }, 1000);
+}
