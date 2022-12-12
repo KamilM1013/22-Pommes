@@ -265,7 +265,6 @@ function PVE() {
     isPVE = true
 
 }
-
 function EVE() {
     !(player1.isPlay() && player2.isPlay() && !player1.isExactly11() && !player2.isExactly11())
         ? location.reload(true) : EVELoop();
@@ -464,7 +463,6 @@ function evaluateMinMax(node, isMaximizing) {
     
     return score
 }
-
 function evaluateNegaMax(node) {
     let score = 0
 
@@ -507,7 +505,7 @@ function evaluateNegaMax(node) {
     return score
 }
 
-//Implementation of minimax algorithm
+//The following functions are implementations of the given algorithm
 let bestMove = null;
 function minMax(board, node, depth, isMaximizing) {
     let boardCopy = JSON.parse(JSON.stringify(board))
@@ -549,8 +547,6 @@ function minMax(board, node, depth, isMaximizing) {
         return bestScore;
     }
 }
-
-//Implementation of negamax algorithm
 function negaMax(board, node, depth) {
     let boardCopy = JSON.parse(JSON.stringify(board))
     let legalMoves = getBoardLegalMoves()
@@ -575,8 +571,6 @@ function negaMax(board, node, depth) {
     }
 
 } 
-
-//Implementation of negamax algorithm with aplha-beta pruning
 function alphaBeta(board, node, depth, alpha, beta) {
     let boardCopy = JSON.parse(JSON.stringify(board))
     let legalMoves = getBoardLegalMoves()
@@ -605,32 +599,37 @@ function alphaBeta(board, node, depth, alpha, beta) {
     }
 
 } 
-
-//Implementation of monte carlo algorithm
 function monteCarlo(board, nofSimulations) {
+    bestMove = null;
     let bestProbability = -1
     let boardCopy = JSON.parse(JSON.stringify(board))
     let legalMoves = getBoardLegalMoves()
     legalMoves.forEach(move => {
         let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
         let farmer = getFarmer(boardCopyCopy)
-        let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
         boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
         boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
         let r = 0
         for(let i = 0; i < nofSimulations; i++) {
             let childBoard = JSON.parse(JSON.stringify(boardCopyCopy))
             let currentPlayer = player1
-            while (!currentPlayer.isExactly11(childBoard)) {
-                let randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)]
-                
+            while (!player1.isExactly11 || !player2.isExactly11) {
+                let currentMoves = getBoardLegalMoves(childBoard)
+                if (currentMoves == 0) {
+                    break
+                } 
+                let randomNumber = Math.floor(Math.random() * ((currentMoves.length-1) - 0 + 1) + 0);
+                let currentMove = currentMoves[randomNumber];
+                let farmer = getFarmer(childBoard)
+                childBoard[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
+                childBoard[currentMove.y - 1][currentMove.x - 1] = { y: currentMove.y, x: currentMove.x, value: 'farmer', color: null }
                 if (currentPlayer === player1){
                     currentPlayer = player2
                 } else if (currentPlayer === player2) {
                     currentPlayer = player1
                 }
             }
-            if (currentPlayer.isExactly11(childBoard)) {
+            if (currentPlayer.isExactly11) {
                 r++
             }
         }
@@ -640,10 +639,10 @@ function monteCarlo(board, nofSimulations) {
             bestProbability = probability
         }
     })
-    return bestMove
+    return [bestProbability, bestMove]
 }
            
-//Used to execute the best move for minmax
+//The following functions are used to execute the given algorithm
 function makeBestMoveMinMax() {
     setTimeout(function(){
     let score 
@@ -656,8 +655,6 @@ function makeBestMoveMinMax() {
     .catch((e) => {console.log(e)})
     }, 1000);
 }
-
-//Used to execute the best move for negamax
 function makeBestMoveNegaMax() {
     setTimeout(function(){
     let score 
@@ -670,8 +667,6 @@ function makeBestMoveNegaMax() {
     .catch((e) => {console.log(e)})
     }, 1000);
 }
-
-//Used to execute the best move for alpha-beta
 function makeBestMoveAlphaBeta() {
     setTimeout(function(){
     let score 
@@ -684,13 +679,11 @@ function makeBestMoveAlphaBeta() {
     .catch((e) => {console.log(e)})
     }, 1000);
 }
-
-//Used to execute the best move for monte carlo
 function makeBestMoveMonteCarlo() {
     setTimeout(function(){
 
     new Promise((resolve, reject) => {
-        resolve(monteCarlo(board, 2))
+        resolve(monteCarlo(board, 100))
     }).then(() => {
         console.log(bestMove)
         move(`#field-${bestMove.y}${bestMove.x}`)
