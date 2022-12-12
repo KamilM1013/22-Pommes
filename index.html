@@ -3,27 +3,27 @@
 
 <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>22 pommes</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+        function show_list() {
+            var courses = document.getElementById("courses_id");
+    
+            if (courses.style.display == "block") {
+                courses.style.display = "none";
+            } else {
+                courses.style.display = "block";
+            }
+        }
+        window.onclick = function (event) {
+            if (!event.target.matches('.dropdown_button')) {
+                document.getElementById('courses_id')
+                    .style.display = "none";
+            }
+        }   
+    
+    </script>
 </head>
-
-<script>
-    function show_list() {
-        var courses = document.getElementById("courses_id");
-
-        if (courses.style.display == "block") {
-            courses.style.display = "none";
-        } else {
-            courses.style.display = "block";
-        }
-    }
-    window.onclick = function (event) {
-        if (!event.target.matches('.dropdown_button')) {
-            document.getElementById('courses_id')
-                .style.display = "none";
-        }
-    }   
-</script>
 
 <body>
     <div class="game" >
@@ -41,6 +41,7 @@
                             <li><a href="#" onclick="isMinMax()">MinMax</a></li>
                             <li><a href="#" onclick="isNegaMax()">NegaMax</a></li>
                             <li><a href="#" onclick="isAlphaBeta()">Alpha-Beta</a></li>
+                            <li><a href="#" onclick="isMonteCarlo()">Monte Carlo</a></li>
                         </div>
                     </div>
             <input type="button" class="btnPVC" value="Player vs random player" onclick="PVE()">

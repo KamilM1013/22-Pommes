@@ -207,6 +207,9 @@ function play() {
             } else if (isPVE && isaplhabeta) {
                 makeBestMoveAlphaBeta()
                 console.log('ALPHA')
+            } else if (isPVE && ismontecarlo) {
+                makeBestMoveMonteCarlo()
+                console.log('MONTE')
             }
         } else if (currentPlayer === player2) {
             document.querySelector('#whichP').innerHTML = "Player 1's turn"
@@ -256,6 +259,7 @@ let israndom = true
 let isminmax = false
 let isnegamax = false
 let alphabeta = false
+let montecarlo = false
 
 function PVE() {
     isPVE = true
@@ -313,24 +317,35 @@ function isRandom() {
     isminmax = false
     isnegamax = false
     isaplhabeta = false
+    ismontecarlo = false
 }
 function isMinMax() {
     isminmax = true
     israndom = false
     isnegamax = false
     isaplhabeta = false
+    ismontecarlo = false
 }
 function isNegaMax() {
     isminmax = false
     israndom = false
     isnegamax = true
     isaplhabeta = false
+    ismontecarlo = false
 }
 function isAlphaBeta() {
     isminmax = false
     israndom = false
     isnegamax = false
     isaplhabeta = true
+    ismontecarlo = false
+}
+function isMonteCarlo() {
+    isminmax = false
+    israndom = false
+    isnegamax = false
+    isaplhabeta = false
+    ismontecarlo = true
 }
 
 //Fetches farmer position
@@ -591,6 +606,43 @@ function alphaBeta(board, node, depth, alpha, beta) {
 
 } 
 
+//Implementation of monte carlo algorithm
+function monteCarlo(board, nofSimulations) {
+    let bestProbability = -1
+    let boardCopy = JSON.parse(JSON.stringify(board))
+    let legalMoves = getBoardLegalMoves()
+    legalMoves.forEach(move => {
+        let boardCopyCopy = JSON.parse(JSON.stringify(boardCopy))
+        let farmer = getFarmer(boardCopyCopy)
+        let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
+        boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
+        boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
+        let r = 0
+        for(let i = 0; i < nofSimulations; i++) {
+            let childBoard = JSON.parse(JSON.stringify(boardCopyCopy))
+            let currentPlayer = player1
+            while (!currentPlayer.isExactly11(childBoard)) {
+                let randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)]
+                
+                if (currentPlayer === player1){
+                    currentPlayer = player2
+                } else if (currentPlayer === player2) {
+                    currentPlayer = player1
+                }
+            }
+            if (currentPlayer.isExactly11(childBoard)) {
+                r++
+            }
+        }
+        let probability = r/nofSimulations
+        if (probability > bestProbability) {
+            bestMove = move
+            bestProbability = probability
+        }
+    })
+    return bestMove
+}
+           
 //Used to execute the best move for minmax
 function makeBestMoveMinMax() {
     setTimeout(function(){
@@ -630,5 +682,19 @@ function makeBestMoveAlphaBeta() {
         move(`#field-${bestMove.y}${bestMove.x}`)
     })
     .catch((e) => {console.log(e)})
-    }, 5000);
+    }, 1000);
+}
+
+//Used to execute the best move for monte carlo
+function makeBestMoveMonteCarlo() {
+    setTimeout(function(){
+
+    new Promise((resolve, reject) => {
+        resolve(monteCarlo(board, 2))
+    }).then(() => {
+        console.log(bestMove)
+        move(`#field-${bestMove.y}${bestMove.x}`)
+    })
+    .catch((e) => {console.log(e)})
+    }, 1000);
 }
