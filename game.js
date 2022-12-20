@@ -523,13 +523,13 @@ if (isMaximizing) {
 
 }
 }
-function negaMax(board, node, depth) {
+function negaMax(board, node, depth, sign) {
 let boardCopy = JSON.parse(JSON.stringify(board))
 let legalMoves = getBoardLegalMoves()
 let children = []
 if (evaluateMinMax(node) > 20000 || depth == 0) {
-    let eval = evaluateMinMax(node)   
-    return eval
+    let eval = sign * evaluateMinMax(node)   
+    return [eval, {name:eval}]
 } else {
     let bestScore = -Infinity;
     legalMoves.forEach(move => {
@@ -538,25 +538,26 @@ if (evaluateMinMax(node) > 20000 || depth == 0) {
         let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
         boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
         boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
-        let score = -negaMax(boardCopyCopy, fieldValue, depth - 1, false);
-        console.log(negaMax(boardCopyCopy, fieldValue, depth - 1, false))
-        //children.push(score[1])
-        if (score > bestScore) {
-            bestScore = score
+        let score = negaMax(boardCopyCopy, fieldValue, depth - 1, -sign);
+        console.log(negaMax(boardCopyCopy, fieldValue, depth - 1, -sign))
+        children.push(score[1])
+        if (score[0] > bestScore) {
+            bestScore = score[0]
             bestMove = move
         }
 
     })
-    //return [bestScore, {name: bestScore, children: children}];
-    return bestScore
+    return [bestScore, {name: bestScore, children: children}];
 }
 
 } 
-function alphaBeta(board, node, depth, alpha, beta) {
+function alphaBeta(board, node, depth, alpha, beta, sign) {
 let boardCopy = JSON.parse(JSON.stringify(board))
 let legalMoves = getBoardLegalMoves()
-if (evaluateNegaMax(node) > 20000 || depth == 0) {
-    return evaluateNegaMax(node)        
+let children = []
+if (evaluateMinMax(node) > 20000 || depth == 0) {
+    let eval = sign * evaluateMinMax(node)   
+    return [eval, {name:eval}]
 } else {
     let bestScore = -Infinity;
     legalMoves.forEach(move => {
@@ -565,18 +566,19 @@ if (evaluateNegaMax(node) > 20000 || depth == 0) {
         let fieldValue =  {value: boardCopyCopy[move.y - 1][move.x - 1].value, color: boardCopyCopy[move.y - 1][move.x - 1].color}
         boardCopyCopy[farmer.y - 1][farmer.x - 1] = { y: farmer.y, x: farmer.x, value: null, color: null }
         boardCopyCopy[move.y - 1][move.x - 1] = { y: move.y, x: move.x, value: 'farmer', color: null }
-        let score = -negaMax(boardCopyCopy, fieldValue, depth - 1, false);
-        if (score > bestScore) {
-            bestScore = score
+        let score = alphaBeta(boardCopyCopy, fieldValue, depth - 1, alpha, beta, -sign);
+        children.push(score[1])
+        if (score[0] > bestScore) {
+            bestScore = score[0]
             bestMove = move
         }
-        alpha = Math.max(alpha, bestScore)
-        if (beta <= alpha) {
-            return
+        alpha = Math.min(alpha, bestScore)
+        if (alpha < beta) {
+            return 
         }
 
     })
-    return bestScore;
+    return [bestScore, {name: bestScore, children: children}];
 }
 
 } 
@@ -642,10 +644,10 @@ function makeBestMoveNegaMax() {
 setTimeout(function(){
 let score 
 new Promise((resolve, reject) => {
-    resolve(score = negaMax(board, null, 3, false))
+    resolve(score = negaMax(board, null, 3, sign = 1))
 }).then(() => {
     console.log(bestMove)
-    //drawGraph(score[1])
+    drawGraph(score[1])
     move(`#field-${bestMove.y}${bestMove.x}`)
 })
 .catch((e) => {console.log(e)})
@@ -655,9 +657,10 @@ function makeBestMoveAlphaBeta() {
 setTimeout(function(){
 let score 
 new Promise((resolve, reject) => {
-    resolve(score = alphaBeta(board, null, 3, false))
+    resolve(score = alphaBeta(board, null, 3, alpha = 1000, beta = -1000, sign = 1))
 }).then(() => {
     console.log(bestMove)
+    drawGraph(score[1])
     move(`#field-${bestMove.y}${bestMove.x}`)
 })
 .catch((e) => {console.log(e)})
