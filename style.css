@@ -15,6 +15,50 @@ body {
     padding-top: 50px;
 }
 
+.dropdown {
+    float: left;
+}
+
+.dropdown_button {
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    width: 200px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border: 1px solid #000000;
+}
+
+.courses {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.courses li {
+    color: black;
+    text-decoration: none;
+    display: block;
+    list-style: none;
+    background-color: rgb(47, 47, 47);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border: 1px solid white;
+}
+
+.courses li a {
+    text-decoration: none;
+    color: white;
+    display: block;
+    padding: 10px;
+}
+
+.courses li:hover {
+    background-color: #0979ad;
+    color: white;
+}
+
 #whichP, #p1, #p2 {
 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -44,6 +88,7 @@ table img {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     float: left;
 }
+
 
 
 
