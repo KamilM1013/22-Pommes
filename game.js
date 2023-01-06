@@ -361,7 +361,7 @@ return farmer
 }
 
 //Fetches all valid moves for back-end algorithm calculation
-function getBoardLegalMoves() {
+function getBoardLegalMoves(board) {
 let farmer = getFarmer(board)
 let legalMoves = []
 
@@ -480,7 +480,7 @@ return score
 let bestMove = null;
 function minMax(board, node, depth, isMaximizing) {
 let boardCopy = JSON.parse(JSON.stringify(board))
-let legalMoves = getBoardLegalMoves()
+let legalMoves = getBoardLegalMoves(boardCopy)
 let children = []
 if (evaluateMinMax(node, isMaximizing) > 20000 || depth == 0) {
     let eval = evaluateMinMax(node, isMaximizing)
@@ -525,10 +525,10 @@ if (isMaximizing) {
 }
 function negaMax(board, node, depth, sign) {
 let boardCopy = JSON.parse(JSON.stringify(board))
-let legalMoves = getBoardLegalMoves()
+let legalMoves = getBoardLegalMoves(boardCopy)
 let children = []
-if (evaluateMinMax(node) > 20000 || depth == 0) {
-    let eval = sign * evaluateMinMax(node)   
+if (evaluateMinMax(node, false) > 20000 || depth == 0) {
+    let eval = sign * evaluateMinMax(node, false)   
     return [eval, {name:eval}]
 } else {
     let bestScore = -Infinity;
@@ -541,6 +541,7 @@ if (evaluateMinMax(node) > 20000 || depth == 0) {
         let score = negaMax(boardCopyCopy, fieldValue, depth - 1, -sign);
         console.log(negaMax(boardCopyCopy, fieldValue, depth - 1, -sign))
         children.push(score[1])
+        console.log(sign)
         if (score[0] > bestScore) {
             bestScore = score[0]
             bestMove = move
