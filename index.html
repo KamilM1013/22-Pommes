@@ -6,60 +6,40 @@
     <title>22 pommes</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v6.js"></script>
-    <script>
-        function show_list() {
-            var courses = document.getElementById("courses_id");
-    
-            if (courses.style.display == "block") {
-                courses.style.display = "none";
-            } else {
-                courses.style.display = "block";
-            }
-        }
-        window.onclick = function (event) {
-            if (!event.target.matches('.dropdown_button')) {
-                document.getElementById('courses_id')
-                    .style.display = "none";
-            }
-        }   
-    
-    </script>
 </head>
 
 <body>
     <div class="game" >
         <div class="buttons">
-            <input type="button" class="btnPVP" value="Player vs player" onclick="PVP()">
-            <body>
-                    <div class="dropdown_list">
-                        <button class="dropdown_button"
-                            onclick="show_list()">
-                            Select algorithm
-                        </button>
-             
-                        <div id="courses_id" class="courses">
-                            <li><a href="#" onclick="isRandom()">Random</a></li>
-                            <li><a href="#" onclick="isMinMax()">MinMax</a></li>
-                            <li><a href="#" onclick="isNegaMax()">NegaMax</a></li>
-                            <li><a href="#" onclick="isAlphaBeta()">Alpha-Beta</a></li>
-                            <li><a href="#" onclick="isMonteCarlo()">Monte Carlo</a></li>
-                        </div>
-                    </div>
-            <input type="button" class="btnPVC" value="Player vs random player" onclick="PVE()">
-            <input type="button" class="btnCVC" value="Random player vs random player" onclick="EVE()">
             <input type="button" class="refresh" value="Refresh" onclick="location.reload(true)">
             <!-- <input type="button" class="pause" value="Pause" onclick="pause()"> -->
+
+            <select id="mode1">
+                <option value="normalplayer">Normal Player</option>
+                <option value="random">Random</option>
+                <option value="minmax">MinMax</option>
+                <option value="negamax">NegaMax</option>
+                <option value="alphabeta">Alpha-Beta</option>
+                <option value="montecarlo">Monte Carlo</option>
+                <option value="montecarlotreesearch">Monte Carlo Tree Search</option>
+            </select>
+            <select id="mode2">
+                <option value="PVP">PVP</option>
+                <option value="PVE">PVE</option>
+                <option value="EVE">EVE</option>
+            </select>
+            <input type="button" class="start" value="Start" onclick="start()">
         </div>
         <table id="gameBoard">
         </table>
     </div>
     <div class="hud">
-        <p id="whichP"></p>
+        <p id="whichP">Player 1's turn</p>
         <p id="p1"></p>
         <p id="p2"></p>
         <p id="info"></p>
         <div id="my_dataviz" style="margin-top:15px"></div>
     </div>    
-    <script type="text/javascript" src="game.js"></script>
+    <script type="module" src="./core.js"></script>
 </body>
 </html>
