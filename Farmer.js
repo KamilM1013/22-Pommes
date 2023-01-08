@@ -10,6 +10,7 @@ export class Farmer {
     setPosition(x, y) {
         this.position.x = x
         this.position.y = y
+        return this
     }
     getPosition() {
         return this.position

@@ -33,4 +33,31 @@ export class Player {
         // console.log(typeof src.value)
         return src.color == "r" ? this.setRed(src.value - 0) : this.setGreen(src.value - 0)
     }
+
+    getLegalMoves(board, farmerPosition) {
+        let legalMoves = []
+
+        for (let i = farmerPosition.y - 1; i >= 0; i--) { //up
+            if (board[i][farmerPosition.x] !== null) {
+                legalMoves.push({ x: farmerPosition.x, y: i })
+            }
+        }
+        for (let i = farmerPosition.y + 1; i < 5; i++) { //down
+            if (board[i][farmerPosition.x] !== null) {
+                legalMoves.push({ x: farmerPosition.x, y: i })
+            }
+        }
+        for (let i = farmerPosition.x + 1; i < 5; i++) { //left
+            if (board[farmerPosition.y][i] !== null) {
+                legalMoves.push({ x: i, y: farmerPosition.y })
+            }
+        }
+        for (let i = farmerPosition.x - 1; i >= 0; i--) { //right
+            if (board[farmerPosition.y][i] !== null) {
+                legalMoves.push({ x: i, y: farmerPosition.y })
+            }
+        }
+        console.log(legalMoves)
+        return legalMoves
+    }
 }

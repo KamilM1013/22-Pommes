@@ -2,83 +2,26 @@ import { Apple } from "./Apple.js"
 import { Farmer } from "./Farmer.js"
 
 export class Board {
-    farmer
     currentPlayer
     waitingPlayer
+    farmer
     rounds = 0
-    board = [
-        new Array(5).fill(null),
-        new Array(5).fill(null),
-        new Array(5).fill(null),
-        new Array(5).fill(null),
-        new Array(5).fill(null)
-    ]
-    images = [
-        '1g.png',
-        '1g.png',
-        '1g.png',
-        '2g.png',
-        '2g.png',
-        '3g.png',
-        '3g.png',
-        '3g.png',
-        '5g.png',
-        '5g.png',
-        '5g.png',
-        '5g.png',
-        '5r.png',
-        '5r.png',
-        '5r.png',
-        '5r.png',
-        '3r.png',
-        '3r.png',
-        '3r.png',
-        '2r.png',
-        '2r.png',
-        '1r.png',
-        '1r.png',
-        '1r.png',
-        'farmer.png',
-    ]
+    board
+    game
 
-    constructor(player1, player2) {
-        this.farmer = new Farmer(0, 0)
-        this.createBoard(this.board)
+    constructor(player1, player2, board, farmer, game) {
+        this.board = board
         this.currentPlayer = player1
         this.waitingPlayer = player2
-    }
-
-    changePlayers() {
-        let tmp = this.currentPlayer
-        if (this.currentPlayer.name == 'Player 1') {
-            document.querySelector('#p1').innerHTML = `${this.currentPlayer.name}: Red: ` + this.currentPlayer.getRed() + ', Green: ' + this.currentPlayer.getGreen()
-        } else {
-            document.querySelector('#p2').innerHTML = `${this.currentPlayer.name}: Red: ` + this.currentPlayer.getRed() + ', Green: ' + this.currentPlayer.getGreen()
-        }
-        if (this.currentPlayer.isPlay() && this.waitingPlayer.isPlay() && !this.currentPlayer.isExactly11() && !this.waitingPlayer.isExactly11()) {
-            document.querySelector('#whichP').innerHTML = `${this.waitingPlayer.name}'s turn`
-        } else {
-            this.currentPlayer.isExactly11() || this.waitingPlayer.isLose()
-                ? info.innerHTML = `${this.waitingPlayer.name} wins in: ` + this.rounds + ' rounds'
-                : info.innerHTML = `${this.waitingPlayer.name} wins in: ` + this.rounds + ' rounds'
-            document.querySelectorAll('td').forEach(x => {let new_element = x.cloneNode(true);
-                x.parentNode.replaceChild(new_element, x);
-            })
-            return false
-        }    
-
-        this.rounds++
-        this.currentPlayer = this.waitingPlayer
-        this.waitingPlayer = tmp
-        return true
+        this.farmer = farmer
+        this.game = game
+        this.createBoard(this.board)
     }
 
     createBoard(board) {
         let boardElement = document.querySelector('#gameBoard')
         let boardBody = document.createElement('tbody')
-        this.#shuffle(this.images)
         let rows = 0
-        let imgIndex = 0
         board.forEach(row => {
             let boardRow = document.createElement('tr')
             boardRow.setAttribute('id', `row${rows}`)
@@ -87,16 +30,12 @@ export class Board {
                 let boardField = document.createElement('td')
                 boardField.setAttribute('id', `field${rows}0${fields}`)
                 let img = boardField.appendChild(document.createElement('img'))
-                img.setAttribute('img', this.images[imgIndex])
-                img.setAttribute('src', `./assets/${this.images[imgIndex]}`)
-                if (this.images[imgIndex] != 'farmer.png') {
-                    board[rows][fields] = new Apple(this.images[imgIndex].slice(1, 2), this.images[imgIndex].slice(0, 1), fields, rows, `./assets/${this.images[imgIndex]}`)
+                img.setAttribute('src', board[rows][fields].image)
+                if (board[rows][fields] instanceof Apple) {
                     img.setAttribute('alt', 'apple')
                 } else {
-                    board[rows][fields] = this.farmer.setPosition(fields, rows)
                     img.setAttribute('alt', 'farmer')
                 }
-                imgIndex++
                 boardRow.appendChild(boardField)
                 fields++
             })
@@ -171,11 +110,16 @@ export class Board {
             this.currentPlayer.typeOfPoints(points)
             console.log(this.currentPlayer.getRed() + ' ' + this.currentPlayer.getGreen())
         }
+        console.log(this.farmer)
         this.board[y][x] = this.farmer
         this.board[farmerPosition.y][farmerPosition.x] = null
+        
         this.farmer.setPosition(x, y)
-
-        if (this.changePlayers()) this.updateBoard(this.board)        
+        this.game.changePlayers()
+        this.updateBoard(this.board)
+        console.log(this.game.makeOponentMove())
+        // (this.game.changePlayers() && this.game.oponent == 'PVP') ? this.updateBoard(this.board) : this.game.makeOponentMove()
+                       
     }
 
     updateBoard(board) {
@@ -183,7 +127,6 @@ export class Board {
         boardElement.innerHTML = ''
         let boardBody = document.createElement('tbody')
         let rows = 0
-        let imgIndex = 0
         board.forEach(row => {
             let boardRow = document.createElement('tr')
             boardRow.setAttribute('id', `row${rows}`)
@@ -204,7 +147,6 @@ export class Board {
                 } else {
                     boardField.style.backgroundColor = 'darkgray'
                 }
-                imgIndex++
                 boardRow.appendChild(boardField)
                 fields++
             })
@@ -213,30 +155,6 @@ export class Board {
         });
         boardElement.appendChild(boardBody)
         this.showLegalMoves()
-    }
-
-    // play() {
-    //     if (this.currentPlayer.isPlay() && this.waitingPlayer.isPlay() && !this.currentPlayer.isExactly11() && !this.waitingPlayer.isExactly11()) {
-    //             document.querySelector('#whichP').innerHTML = "Player 2's turn"
-    //             document.querySelector('#whichP').innerHTML = "Player 1's turn"
-    //     } else {
-    //         player1.isExactly11() || player2.isLose()
-    //             ? info.innerHTML = 'Player 1 wins in: ' + rounds + ' rounds'
-    //             : info.innerHTML = 'Player 2 wins in: ' + rounds + ' rounds'
-    //         document.querySelectorAll('td').forEach(x => x.firstChild.setAttribute('onclick', null))
-    //     }
-    //     document.querySelector('#p1').innerHTML = 'Player 1: Red: ' + player1.getRed() + ', Green: ' + player1.getGreen()
-    //     document.querySelector('#p2').innerHTML = 'Player 2: Red: ' + player2.getRed() + ', Green: ' + player2.getGreen()
-    // }
-
-    #shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1))
-            let k = array[i]
-            array[i] = array[j]
-            array[j] = k
-        }
-        return array
     }
 
     #lpad(value, padding) {
