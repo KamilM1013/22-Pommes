@@ -115,14 +115,16 @@ export class Board {
         this.board[farmerPosition.y][farmerPosition.x] = null
         
         this.farmer.setPosition(x, y)
-        this.game.changePlayers()
-        this.updateBoard(this.board)
-        console.log(this.game.makeOponentMove())
-        // (this.game.changePlayers() && this.game.oponent == 'PVP') ? this.updateBoard(this.board) : this.game.makeOponentMove()
-                       
+        let result = this.game.changePlayers()
+        if (result instanceof Array) {
+            this.updateBoard(result)
+        } else {
+            this.updateBoard(this.board)
+        }
     }
 
     updateBoard(board) {
+        // console.log(board)
         let boardElement = document.querySelector('#gameBoard')
         boardElement.innerHTML = ''
         let boardBody = document.createElement('tbody')
@@ -154,7 +156,16 @@ export class Board {
             rows++
         });
         boardElement.appendChild(boardBody)
-        this.showLegalMoves()
+        if (!this.game.gameOver) {
+            this.showLegalMoves()
+        }
+    }
+
+    showMove(board) {
+        this.updateBoard(board)
+        if (this.game.gameOver) {
+            document.querySelector('.step').setAttribute('disabled', true)
+        }
     }
 
     #lpad(value, padding) {

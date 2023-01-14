@@ -3,7 +3,8 @@ export class Player {
     red = 0
     color
     name
-
+    script = null
+    
     constructor(color, name) {
         this.color = color
         this.name = name
@@ -57,7 +58,6 @@ export class Player {
                 legalMoves.push({ x: i, y: farmerPosition.y })
             }
         }
-        console.log(legalMoves)
         return legalMoves
     }
 }

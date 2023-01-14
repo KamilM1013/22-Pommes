@@ -13,9 +13,12 @@
         <div class="buttons">
             <input type="button" class="refresh" value="Refresh" onclick="location.reload(true)">
             <!-- <input type="button" class="pause" value="Pause" onclick="pause()"> -->
-
-            <select id="mode1">
-                <option value="normalplayer">Normal Player</option>
+            <select id="mode2">
+                <option value="PVP">PVP</option>
+                <option value="PVE">PVE</option>
+                <option value="EVE">EVE</option>
+            </select>
+            <select id="mode1" style="visibility: hidden">
                 <option value="random">Random</option>
                 <option value="minmax">MinMax</option>
                 <option value="negamax">NegaMax</option>
@@ -23,12 +26,8 @@
                 <option value="montecarlo">Monte Carlo</option>
                 <option value="montecarlotreesearch">Monte Carlo Tree Search</option>
             </select>
-            <select id="mode2">
-                <option value="PVP">PVP</option>
-                <option value="PVE">PVE</option>
-                <option value="EVE">EVE</option>
-            </select>
             <input type="button" class="start" value="Start">
+            <input type="button" class="step" value="Step" style="visibility: hidden">
         </div>
         <table id="gameBoard">
         </table>

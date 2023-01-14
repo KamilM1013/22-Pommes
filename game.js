@@ -12,6 +12,7 @@ export class Game {
     farmer
     player1
     player2
+    gameOver = false
     board = [
         new Array(5).fill(null),
         new Array(5).fill(null),
@@ -101,6 +102,7 @@ export class Game {
             this.gameBoard.showLegalMoves()
         } else if (this.oponent == 'EVE') {
             this.gameBoard.showLegalMoves()
+            document.querySelector('.step').addEventListener('click', this.step.bind(this))
         }
     }
 
@@ -126,43 +128,67 @@ export class Game {
     }
 
     changePlayers() {
-        let tmp = this.gameBoard.currentPlayer
-        if (this.gameBoard.currentPlayer.name == 'Player 1') {
-            document.querySelector('#p1').innerHTML = `${this.gameBoard.currentPlayer.name}: Red: ` + this.gameBoard.currentPlayer.getRed() + ', Green: ' + this.gameBoard.currentPlayer.getGreen()
-        } else {
-            document.querySelector('#p2').innerHTML = `${this.gameBoard.currentPlayer.name}: Red: ` + this.gameBoard.currentPlayer.getRed() + ', Green: ' + this.gameBoard.currentPlayer.getGreen()
+        console.log('1')
+        let result = false
+        this.countPoints()
+        if (!this.gameOver) {
+            if (this.oponent == 'EVE') {
+                console.log(this.gameBoard.currentPlayer)
+                this.gameBoard.rounds++
+                this.gameBoard.currentPlayer === this.player1 ? this.gameBoard.currentPlayer = this.player2 : this.gameBoard.currentPlayer = this.player1
+                this.countPoints()
+                return
+            } else {
+                if (this.gameBoard.waitingPlayer.script == 'random') {
+                    this.gameBoard.rounds++
+                    this.gameBoard.currentPlayer === this.player1 ? this.gameBoard.currentPlayer = this.player2 : this.gameBoard.currentPlayer = this.player1
+                    let board = this.makeOponentMove(this.gameBoard.currentPlayer)
+                    if (board instanceof Array) result = board
+                    this.countPoints()
+                } 
+                this.gameBoard.rounds++
+                this.gameBoard.currentPlayer === this.player1 ? this.gameBoard.currentPlayer = this.player2 : this.gameBoard.currentPlayer = this.player1
+                if (!this.gameBoard.waitingPlayer.script) {
+                    result = true
+                }
+            }
         }
-        if (this.gameBoard.currentPlayer.isPlay() && this.gameBoard.waitingPlayer.isPlay() && !this.gameBoard.currentPlayer.isExactly11() && !this.gameBoard.waitingPlayer.isExactly11()) {
-            document.querySelector('#whichP').innerHTML = `${this.gameBoard.waitingPlayer.name}'s turn`
+        return result
+    }
+
+    countPoints() {   
+        // console.log(this.player1)
+        // console.log(this.player2)
+        document.querySelector('#p1').innerHTML = `${this.player1.name}: Red: `
+            + this.player1.getRed() + ', Green: ' + this.player1.getGreen()
+        
+        document.querySelector('#p2').innerHTML = `${this.player2.name}: Red: `
+                + this.player2.getRed() + ', Green: ' + this.player2.getGreen()
+        
+        if (this.player1.isPlay() && this.player2.isPlay()
+            && !this.player1.isExactly11() && !this.player2.isExactly11()) {
+            document.querySelector('#whichP').innerHTML = `${this.gameBoard.currentPlayer.name}'s turn`
         } else {
-            this.gameBoard.currentPlayer.isExactly11() || this.gameBoard.waitingPlayer.isLose()
-                ? info.innerHTML = `${this.gameBoard.waitingPlayer.name} wins in: ` + this.gameBoard.rounds + ' rounds'
-                : info.innerHTML = `${this.gameBoard.waitingPlayer.name} wins in: ` + this.gameBoard.rounds + ' rounds'
+            this.player1.isExactly11() || this.player2.isLose()
+                ? info.innerHTML = `${this.player1.name} wins in: ` + this.gameBoard.rounds + ' rounds'
+                : info.innerHTML = `${this.player2.name} wins in: ` + this.gameBoard.rounds + ' rounds'
             document.querySelectorAll('td').forEach(x => {
                 let new_element = x.cloneNode(true);
                 x.parentNode.replaceChild(new_element, x);
             })
-            return false
+            this.gameOver = true
         }
-
-        this.gameBoard.rounds++
-        this.gameBoard.currentPlayer = this.gameBoard.waitingPlayer
-        this.gameBoard.waitingPlayer = tmp
-        return true
     }
 
-    makeOponentMove() {
-        // new Promise(async resolve => {
-        //     await resolve(this.player2.makeMove())
-        // }).then(() => {
-        //     this.changePlayers()
-        // }).catch(exc => {
-        //     console.log(JSON.parse(exc))
-        // })
-        if (this.player2.makeMove() instanceof Board) {
-            this.changePlayers()
-            this.gameBoard.updateBoard()
-        }
+    makeOponentMove(player) {
+        let legalMoves = player.getLegalMoves(this.board, this.farmer.getPosition())
+        return player.makeMove(legalMoves, this.board, this.farmer)
+    }
+
+    step() {
+        let board = this.makeOponentMove(this.gameBoard.currentPlayer)
+        this.changePlayers()
+        this.gameBoard.showMove(board)
     }
 
     #shuffle(array) {
