@@ -4,7 +4,7 @@ export class Player {
     color
     name
     script = null
-    
+
     constructor(color, name) {
         this.color = color
         this.name = name
@@ -31,10 +31,16 @@ export class Player {
         this.red += points
     }
     typeOfPoints(src) {
-        // console.log(typeof src.value)
         return src.color == "r" ? this.setRed(src.value - 0) : this.setGreen(src.value - 0)
     }
-
+    savePointsState() {
+        localStorage.setItem(`red${this.script}`, JSON.stringify(this.getRed()))
+        localStorage.setItem(`green${this.script}`, JSON.stringify(this.getGreen()))
+    }
+    loadPointsState() {
+        this.red = parseInt(localStorage.getItem(`red${this.script}`))
+        this.green = parseInt(localStorage.getItem(`green${this.script}`))
+    }
     getLegalMoves(board, farmerPosition) {
         let legalMoves = []
 
@@ -48,12 +54,12 @@ export class Player {
                 legalMoves.push({ x: farmerPosition.x, y: i })
             }
         }
-        for (let i = farmerPosition.x + 1; i < 5; i++) { //left
+        for (let i = farmerPosition.x + 1; i < 5; i++) { //right
             if (board[farmerPosition.y][i] !== null) {
                 legalMoves.push({ x: i, y: farmerPosition.y })
             }
         }
-        for (let i = farmerPosition.x - 1; i >= 0; i--) { //right
+        for (let i = farmerPosition.x - 1; i >= 0; i--) { //left
             if (board[farmerPosition.y][i] !== null) {
                 legalMoves.push({ x: i, y: farmerPosition.y })
             }

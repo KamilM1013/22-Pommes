@@ -4,6 +4,7 @@ import { Board } from "./Board.js"
 import { Farmer } from "./Farmer.js"
 import { Apple } from "./Apple.js"
 import { Random } from "./Random.js"
+import { Mcts } from "./Mcts.js"
 
 export class Game {
     gameMode
@@ -64,7 +65,7 @@ export class Game {
                         this.player2 = new Random('rgb(196, 78, 78)', 'Player 2')
                         break;
                     case 'montecarlotreesearch':
-
+                        this.player2 = new Mcts('rgb(196, 78, 78)', 'Player 2')
                         break;
                     default:
                         break;
@@ -77,7 +78,7 @@ export class Game {
                         this.player2 = new Random('rgb(196, 78, 78)', 'Player 2')
                         break;
                     case 'montecarlotreesearch':
-
+                        this.player2 = new Mcts('rgb(196, 78, 78)', 'Player 2')
                         break;
                     default:
                         break;
@@ -128,12 +129,10 @@ export class Game {
     }
 
     changePlayers() {
-        console.log('1')
         let result = false
         this.countPoints()
         if (!this.gameOver) {
             if (this.oponent == 'EVE') {
-                console.log(this.gameBoard.currentPlayer)
                 this.gameBoard.rounds++
                 this.gameBoard.currentPlayer === this.player1 ? this.gameBoard.currentPlayer = this.player2 : this.gameBoard.currentPlayer = this.player1
                 this.countPoints()
@@ -145,7 +144,13 @@ export class Game {
                     let board = this.makeOponentMove(this.gameBoard.currentPlayer)
                     if (board instanceof Array) result = board
                     this.countPoints()
-                } 
+                } else if (this.gameBoard.waitingPlayer.script == 'montecarlotreesearch') {
+                    this.gameBoard.rounds++
+                    this.gameBoard.currentPlayer === this.player1 ? this.gameBoard.currentPlayer = this.player2 : this.gameBoard.currentPlayer = this.player1
+                    let board = this.makeOponentMove(this.gameBoard.currentPlayer)
+                    if (board instanceof Array) result = board
+                    this.countPoints()
+                }
                 this.gameBoard.rounds++
                 this.gameBoard.currentPlayer === this.player1 ? this.gameBoard.currentPlayer = this.player2 : this.gameBoard.currentPlayer = this.player1
                 if (!this.gameBoard.waitingPlayer.script) {
@@ -182,7 +187,7 @@ export class Game {
 
     makeOponentMove(player) {
         let legalMoves = player.getLegalMoves(this.board, this.farmer.getPosition())
-        return player.makeMove(legalMoves, this.board, this.farmer)
+        return player.makeMove(legalMoves, this.board, this.farmer, this)
     }
 
     step() {
